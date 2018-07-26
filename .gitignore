@@ -84,5 +84,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# PPT
+*.pptx
+
 
 # End of https://www.gitignore.io/api/linux,macos,windows,jupyternotebook,visualstudiocode
