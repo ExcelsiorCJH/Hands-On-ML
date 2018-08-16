@@ -98,7 +98,7 @@ $$
 L(x, y, \alpha) = f(x, y) - \alpha \left( 3x + 2y +1 \right) = x^2 + 2y - \alpha \left( 3x + 2y +1 \right)
 $$
 
-조제프루이 라그랑제(Joseph-Louis Lagrange)는 위의 라그랑지안 함수 $f(\cdot)$처럼 $(\hat{x}, \hat{y})$가 제약이 있는 최적화 문제의 해라면, $(\hat{x}, \hat{y}, \hat{\alpha})$가 함수 $L(\cdot)$의 **정류점**(stationary point) 즉, 모든 편도함수(partial derivative)가 0인 지점이 되는 $\hat{\alpha}$가 존재한다는 것을 보였다.
+조제프루이 라그랑제(Joseph-Louis Lagrange)는 위의 라그랑지안 함수 $L(\cdot)​$처럼 $(\hat{x}, \hat{y})​$가 제약이 있는 최적화 문제의 해라면, $(\hat{x}, \hat{y}, \hat{\alpha})​$가 함수 $L(\cdot)​$의 **정류점**(stationary point) 즉, 모든 편도함수(partial derivative)가 0인 지점이 되는 $\hat{\alpha}​$가 존재한다는 것을 보였다.
 
 따라서, $x, y, \alpha$에 대한 라그랑지안 $L(x, y, \alpha)$의 편도함수를 계산할 수 있으면 이 도함수가 모두 0이 되는 지점을 찾을 수 있고, 제약이 있는 최적화 문제의 해는 이런 정류점 중에 있어야 한다.
 
@@ -286,7 +286,7 @@ $$
 \max { { L }({ \alpha  }_{ i }) } &= \sum _{ i=1 }^{ n }{ { \alpha  }_{ i } } -\frac { 1 }{ 2 } \sum _{ i=1 }^{ n }{ \sum _{ j=1 }^{ n }{ { \alpha  }_{ i }{ { \alpha  }_{ j }t }_{ i }{ t }_{ j } \Phi({ x }_{ i })^{ T }\Phi({ x }_{ j }) }  } \\&=  \sum _{ i=1 }^{ n }{ { \alpha  }_{ i } } -\frac { 1 }{ 2 } \sum _{ i=1 }^{ n }{ \sum _{ j=1 }^{ n }{ { \alpha  }_{ i }{ { \alpha  }_{ j }t }_{ i }{ t }_{ j } K({ x }_{ i }, x_j) }  }
 \end{align*}
 $$
- 
+
 
 ### 커널의 종류
 
