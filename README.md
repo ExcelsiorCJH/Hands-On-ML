@@ -14,8 +14,7 @@
 - Chap03 - [분류](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap03-Classification/Chap03-Classification.ipynb)
 - Chap04 - [모델 훈련](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap04-Training_Models/Chap04-Training_Models.ipynb)
 - Chap05 - [Support Vector Machine](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap05-SVM/Chap05-SVM.ipynb)
-- Chap06 - [Decision Tree](https://github.com/ExcelsiorCJH/Hands-On-ML/tree/master/Chap06-Decision_Tree)
-
+- Chap06 - [Decision Tree](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap06-Decision_Tree/Chap06-Decision_Tree.ipynb)
 
 ## 3. 참고자료
 
