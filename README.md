@@ -16,6 +16,8 @@
 - Chap05 - [Support Vector Machine](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap05-SVM/Chap05-SVM.ipynb)
 - Chap06 - [Decision Tree](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap06-Decision_Tree/Chap06-Decision_Tree.ipynb)
 - Chap07 - [앙상블 학습과 랜덤 포레스트](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap07-Ensemble_Learning_and_Random_Forests/Chap07-Ensemble_Learning_and_Random_Forests.ipynb)
+- Chap08 - [차원 축소](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap08-Dimensionality_Reduction/Chap08-Dimensionality_Reduction.ipynb)
+
 
 ## 3. 참고자료
 

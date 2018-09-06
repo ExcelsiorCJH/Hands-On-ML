@@ -12,7 +12,7 @@
 
 
 
-![](./images/manifold02.png)
+![](./images/manifold05.PNG)
 
 
 
@@ -38,7 +38,7 @@ LLE 알고리즘을 각 단계별로 자세히 살펴보도록 하자.
 
 ### Step 1: Select Neighbors
 
-먼저, $N$-차원($N$-Features)을 가지는 $m$-개의 데이터셋의 각 데이터 포인트 $X_i$에 대해, $X_i$와 가장 가까운 $k$-개의 이웃점($k$-nearest neighbors) $X_j$, $(j=1, \dots, k)$ 들을 선택한다. 여기서 $k$는 하이퍼파라미터(hyper-parmeter)로써 사람이 직접 적절한 개수를 정해준다.
+먼저, $N$-차원($N$-Features)을 가지는 $m$-개의 데이터셋의 각 데이터 포인트 $\vec{x}_i$에 대해, $\vec{x}_i$와 가장 가까운 $k$-개의 이웃점($k$-nearest neighbors) $\vec{x}_j$, $(j=1, \dots, k)$ 들을 선택한다. 여기서 $k$는 하이퍼파라미터(hyper-parameter)로써 사람이 직접 적절한 개수를 정해준다.
 
 
 
