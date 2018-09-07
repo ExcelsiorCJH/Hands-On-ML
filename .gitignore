@@ -91,4 +91,7 @@ $RECYCLE.BIN/
 model/
 model/*
 
+# tfgraphviz
+*.gv
+
 # End of https://www.gitignore.io/api/linux,macos,windows,jupyternotebook,visualstudiocode
