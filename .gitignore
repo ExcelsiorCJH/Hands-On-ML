@@ -94,4 +94,12 @@ model/*
 # tfgraphviz
 *.gv
 
+# log dir
+logs/
+logs/*
+tf.logs/
+tf.logs/*
+tf_logs/
+tf_logs/
+
 # End of https://www.gitignore.io/api/linux,macos,windows,jupyternotebook,visualstudiocode
