@@ -21,7 +21,7 @@
 
 ### Part 2. 신경망과 딥러닝
 - Chap09 - [텐서플로 시작하기](https://github.com/ExcelsiorCJH/Hands-On-ML/tree/master/Chap09-Up_and_Running_with_TensorFlow)
-
+- Chap10 - [인공 신경망 소개](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap10-Introduction_to_ANN/Chap10-Introduction_to_ANN.ipynb)
 
 ## 3. 참고자료
 
