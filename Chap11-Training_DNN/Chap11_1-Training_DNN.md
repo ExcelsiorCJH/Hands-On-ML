@@ -163,7 +163,7 @@ ELU는 ReLU와 달리 다음과 같은 특성을 가진다.
 
 따라서, 가중치 초기값을 작게 초기화 해야하며 동일한 초기값을 가지지 않도록 랜덤하게 초기화 해야한다. 일반적으로 가중치 초기값은 평균이 0이고 표준편차가 0.01인 정규분포(가우시안 분포)를 따르는 값으로 랜덤하게 초기화 한다.
 
-이러한 가중치 초기화 방법은 얕은 신경망에서는 괜찮게 작동할지 모르지만 신경망의 깊이가 깊어질수록 문제가 발생하게 된다. 예를들어, 평균이 0이고 표준편차가 0.01인 정규분포(가우시안 분포)를 따르는 값으로 랜덤하게 초기화하고 tanh를 활성화 함수로 사용하였을 경우, 아래의 그림처럼 첫번째 hidden layer를 제외한 나머지 레이어들이 모두 0을 출력하고 있는것을 확인할 수 있다. 따라서, 4.1에서 살펴보았듯이 모든 뉴런의 그래디언트 값이 동일하기 때문에 학습이 이루어지지 않게 된다. 아래의 그림에 해당하는 코드는 [여기](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11-Training_DNN.ipynb)서 확인할 수 있다.
+이러한 가중치 초기화 방법은 얕은 신경망에서는 괜찮게 작동할지 모르지만 신경망의 깊이가 깊어질수록 문제가 발생하게 된다. 예를들어, 평균이 0이고 표준편차가 0.01인 정규분포(가우시안 분포)를 따르는 값으로 랜덤하게 초기화하고 tanh를 활성화 함수로 사용하였을 경우, 아래의 그림처럼 첫번째 hidden layer를 제외한 나머지 레이어들이 모두 0을 출력하고 있는것을 확인할 수 있다. 따라서, 4.1에서 살펴보았듯이 모든 뉴런의 그래디언트 값이 동일하기 때문에 학습이 이루어지지 않게 된다. 아래의 그림에 해당하는 코드는 [여기](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_1-Training_DNN.ipynb)서 확인할 수 있다.
 
 ![](./images/weight_init.png)
 
@@ -203,7 +203,7 @@ Xavier 초기값은 **활성화 함수가 선형(linear)이라고 가정**한다
 
 
 
-아래의 그림처럼(관련 코드는 [여기](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11-Training_DNN.ipynb) 참고) tanh 활성화 함수에 xavier 초기값을 설정했을 때, 4.2에서 작은 난수 초기화 했을 때보다 넓게 분포되어 있는것을 확인할 수 있다.
+아래의 그림처럼(관련 코드는 [여기](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_1-Training_DNN.ipynb) 참고) tanh 활성화 함수에 xavier 초기값을 설정했을 때, 4.2에서 작은 난수 초기화 했을 때보다 넓게 분포되어 있는것을 확인할 수 있다.
 
 ![](./images/xavier_init.png)
 
@@ -235,7 +235,11 @@ He 초기값 또한 텐서플로에서 쉽게 사용할 수 있도록 [`tf.keras
 
 ## 5. 마무리 
 
-이번 포스팅에서는 심층 신경망을 학습시키기 위해 적절한 활성화 함수와 가중치 초기화 방법에 대해 알아보았다.  이번 포스팅의 내용을 아주 간략하게 요약하면 다음과 같다.
+이번 포스팅에서는 심층 신경망을 학습시키기 위해 적절한 활성화 함수와 가중치 초기화 방법에 대해 알아보았다.  이번 포스팅의 내용을 아주 간략하게 요약하면 다음과 같다. 
 
 - 활성화 함수로는 ReLU를 먼저 사용하는 것이 좋다.
 - 가중치 초기화는 Sigmoid일 경우 Xavier, ReLU일 경우 He 초기값을 사용하는 것이 좋다.
+
+
+
+위의 그림에대한 코드는 https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_1-Training_DNN.ipynb에서 확인할 수 있다.
