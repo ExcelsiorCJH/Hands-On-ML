@@ -101,6 +101,8 @@ Batch Normalization(BN)은 논문에서 실험했던 모든 DNN의 성능이 크
 
 
 
+아래에 대한 전체 코드는 [ExcelsiorCJH](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_2-Training_DNN.ipynb) GitHub에서 확인할 수 있다.
+
 #### 1) MNIST DataSet Load
 
 먼저, 학습과 테스트에 사용할 MNIST 데이터셋을 로드한 뒤 랜덤하게 미니배치 크기만큼 가져오기 위한 `shuffle_batch()` 함수를 구현하자.
