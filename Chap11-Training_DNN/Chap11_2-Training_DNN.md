@@ -53,7 +53,7 @@ $$
 위의 식에서 입력 데이터($x_i$)에 대해 정규화(normalization, $\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_{B}^{2}+\varepsilon}}$)를 하게 되면, $\hat{x}_i$의 값이 대부분 0에 가까운 값이 될 것이다. 만약, 이러한 정규화된 입력 데이터 $\hat{x}_{i}$가 시그모이드(sigmoid) 활성화 함수의 입력값으로 들어가게 되면, 비선형(nonlinearity) 함수인 sigmoid가 선형(linearity)구간에 빠지게 된다(sigmoid 함수는 0 부근에서 선형성을 띤다). 이러한 문제를 해결하기 위해서 아래의 식과 같이 정규화된 입력 데이터 $x_i$에 scaling과 shifting해주는 $\gamma$와 $\beta$를 적용 해준다.
 
 $$
-y_i = \color{red}{\gamma} \color{black} \hat{x}_i + \color{red}{\beta}
+y_i = \color{red}{\gamma} \color{black}\hat{x}_i + \color{red}{\beta}
 $$
 
 
@@ -236,3 +236,99 @@ epoch: 004, valid. Acc: 0.9798
 
 
 
+
+
+## 2. 그래디언트 클리핑 (Gradient Clipping)
+
+그래디언트 클리핑(Gradient Clipping)은 그래디언트 폭주(exploding gradient) 문제를 줄이는 방법이며, 역전파(backprop) 단계에서 그래디언트 값이 아래의 그림과 같이 특정 임계값(threshold)을 넘지 않도록 잘라내는 방법이다.
+
+![](./images/clipping.png)
+
+
+
+
+
+### 2.1 텐서플로에서 그래디언트 클리핑 구현하기
+
+텐서플로에서는 [`tf.clip_by_value`](https://www.tensorflow.org/api_docs/python/tf/clip_by_value)를 이용해 그래디언트 클리핑을 구현할 수 있다. 아래의 예제는 '1.4 텐서플로에서 Batch Normalization 구현하기'에서 사용한 MNIST 데이터셋을 분류하는 간단한 분류기를 구현한 뒤에 그래디언트 클리핑을 적용한 예제이다. 아래의 전체 코드는 [ExcelsiorCJH](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_2-Training_DNN.ipynb) GitHub에서 확인할 수 있다.
+
+ `tf.clip_by_value`를 사용하려면, 아래의 코드에서 옵티마이저(`tf.train.GradientDescentOptimizer`)에 사용해야 한다. '1.4 텐서플로에서 Batch Normalization 구현하기'에서는 옵티마이저의 `minimize()`함수를 이용해 그래디언트 계산과 적용을 처리 했다. 이러한 `minimize()`함수를 다음과 같이 두 가지 함수로 분리할 수 있다.
+
+- 옵티마이저의 `compute_gradients()`함수를 이용해 먼저 그래디언트를 계산한다.
+- 옵티마이저의 `apply_gradients()`함수에 `tf.clip_by_value()`를 적용하여 클리핑된 그래디언트를 적용한다.
+
+
+
+```python
+################
+# layer params #
+################
+n_inputs = 28*28
+n_hidden1 = 300
+n_hidden2 = 100
+n_outputs = 10
+
+# input layer
+inputs = tf.placeholder(tf.float32, shape=[None, n_inputs], name="X")
+# output layer
+labels = tf.placeholder(tf.int32, shape=[None], name='labels')
+
+with tf.name_scope('dnn'):
+    hidden1 = tf.layers.dense(inputs, n_hidden1, activation=tf.nn.relu, name="hidden1")
+    hidden2 = tf.layers.dense(hidden1, n_hidden2, activation=tf.nn.relu, name='hidden2')
+    logits = tf.layers.dense(hidden2, n_outputs, name='logits')
+    
+with tf.name_scope('loss'):
+    xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits)
+    loss = tf.reduce_mean(xentropy, name='loss')
+    
+################
+# Hyper-params #
+################
+learning_rate = 0.01
+threshold = 1.0
+n_epochs = 5
+batch_size = 50
+
+with tf.name_scope('train'):
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    # 그래디언트 계산
+    grad_and_vars = optimizer.compute_gradients(loss)
+    # 그래디언트 클리핑
+    clipped_grads = [(tf.clip_by_value(grad, -threshold, threshold), var)
+                     for grad, var in grad_and_vars]
+    # 클리핑 된 그래디언트 적용
+    train_op = optimizer.apply_gradients(clipped_grads)
+    
+with tf.name_scope('eval'):
+    correct = tf.nn.in_top_k(logits, labels, 1)
+    accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
+    
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    
+    for epoch in range(n_epochs):
+        for batch_x, batch_y in shuffle_batch(train_x, train_y, batch_size):
+            sess.run(train_op, feed_dict={inputs: batch_x, 
+                                          labels:batch_y})
+            
+        # validation
+        accuracy_val = accuracy.eval(feed_dict={inputs: valid_x, labels: valid_y})
+        print('epoch: {:03d}, valid. Acc: {:.4f}'.format(epoch, accuracy_val))
+        
+"""
+epoch: 000, valid. Acc: 0.9026
+epoch: 001, valid. Acc: 0.9244
+epoch: 002, valid. Acc: 0.9362
+epoch: 003, valid. Acc: 0.9410
+epoch: 004, valid. Acc: 0.9460
+"""
+```
+
+
+
+## 3. 마무리
+
+이번 포스팅에서는 심층 신경망 학습 단계에서 그래디언트 소실/폭주 문제를 감소시키는 기법인 배치 정규화(Batch Normalization)와 그래디언트 클리핑(Graident Clipping)에 대해 알아보았다. 
+
+위의 코드에 대한 전체 코드는 https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_2-Training_DNN.ipynb 에서 확인할 수 있다.
