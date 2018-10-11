@@ -514,3 +514,6 @@ with tf.Session() as sess:
 
 
 
+## 4. 마무리
+
+이번 포스팅에서는 Transfer Learning에 대해서 알아보았으며, 텐서플로를 이용하여 사전에 학습된 모델을 재사용하고, Transfer Learning을 수행하는 방법에 대해 알아보았다. 위의 코드에 대한 전체코드는 https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_3-Training_DNN.ipynb 에서 확인할 수 있다.
