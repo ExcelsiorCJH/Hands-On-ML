@@ -510,6 +510,15 @@ with tf.Session() as sess:
     
     # save the new model
     save_path = new_saver.save(sess, os.path.join(MODEL_PATH, 'my_caching_model.ckpt'))
+    
+'''
+INFO:tensorflow:Restoring parameters from ./model/my_model.ckpt
+epoch: 00, valid. Acc: 0.9504
+epoch: 01, valid. Acc: 0.9544
+epoch: 02, valid. Acc: 0.9554
+epoch: 03, valid. Acc: 0.9562
+epoch: 04, valid. Acc: 0.9576
+'''
 ```
 
 
