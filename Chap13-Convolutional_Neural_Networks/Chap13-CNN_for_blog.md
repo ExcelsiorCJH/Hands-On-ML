@@ -1,6 +1,19 @@
-# Chap13 - Convolutional Neural Networks
+> 이번 포스팅은   [핸즈온 머신러닝](http://www.yes24.com/24/goods/59878826?scode=032&OzSrank=1) 교재, cs231n 강의를 가지고 공부한 것을 정리한 포스팅입니다. 
+>
+> CNN에 대해 좀 더 간략하게 알고 싶으신 분들은 아래의 링크를 참고하면 됩니다.
+>
+> - **간략한 설명** : [  합성곱신경망(CNN, Convolutional Neural Network)](http://excelsior-cjh.tistory.com/79?category=1013831)
+> - **텐서플로 실습 위주** : [[러닝 텐서플로]Chap04 - 합성곱 신경망 CNN](http://excelsior-cjh.tistory.com/152?category=940399)
 
-## 13.1 시각 피질의 구조
+
+
+ㅁㅇㄴㄹㅇ
+
+
+
+# 06. 합성곱 신경망 - Convolutional Neural Networks
+
+## 1. CNN의 기원
 
 David H. Hubel과 Torsten Wiesel은 1958년과 1959년에 시각 피질의 구조에 대한 결정적인 통찰을 제공한 고양이 실험을 수행했다. 이들은 시각 피질 안의 많은 뉴런이 작은 **local receptive field**(국부 수용영역)을 가진다는 것을 보였으며, 이것은 뉴런들이 시야의 일부 범위 안에 있는 시각 자극에만 반응을 한다는 의미이다. 뉴런의 수용영역(receptive field)들은 서로 겹칠수 있으며, 이렇게 겹쳐진 수용영역들이 전체 시야를 이루게 된다. 추가적으로 어떤 뉴런은 수직선의 이미지에만 반응하고, 다른 뉴런은 다른 각도의 선에 반응하는 뉴런이 있을 뿐만아니라, 어떤 뉴런은 큰 수용영역을 가져 저수준의 패턴(edge, blob 등)이 조합되어 복잡한 패턴(texture, object)에 반응하다는 것을 알게 되었다.  이러한 관찰을 통해 고수준의 뉴런이 이웃한 저수준의 뉴런의 출력에 기반한다는 아이디어를 생각해 냈다. (아래 그림출처 : [brainconnection](https://brainconnection.brainhq.com/2004/03/06/overview-of-receptive-fields/))
 
@@ -20,9 +33,9 @@ CNN의 구조는 아래의 그림과 같이 완전연결(fully connected)계층�
 
 
 
-## 13.2 합성곱층 (Convolutional layer)
+## 2. 합성곱층 (Convolutional layer)
 
-### 13.2.1 완전연결 계층의 문제점
+### 2.1 완전연결 계층의 문제점
 
 완전연결 계층(fully connected layer)을 이용해 MNIST 데이터셋을 분류하는 모델을 만들 때,  3차원(세로, 가로, 채널)인 MNIST 데이터(28, 28, 1)를 입력층(input layer)에 넣어주기 위해서 아래의 그림(출처: [cntk.ai](https://cntk.ai/pythondocs/CNTK_103A_MNIST_DataLoader.html))처럼, 3차원 → 1차원의 평평한(flat) 데이터로 펼쳐줘야 했다.  즉, (28, 28, 1)의 3차원 데이터를 $28 \times 28 \times 1 = 784$의 1차원 데이터로 바꾼다음 입력층에 넣어줬다.
 
@@ -36,9 +49,9 @@ CNN의 구조는 아래의 그림과 같이 완전연결(fully connected)계층�
 
 
 
-### 13.2.2 합성곱층
+### 2.2 합성곱층
 
-합성곱층은 CNN에서 가장 중요한 구성요소이며, 13.2.1의 완전연결 계층과는 달리 **합성곱층(convolutional layer)**은 아래의 그림과 같이 입력 데이터의 형상을 유지한다. 3차원의 이미지 그대로 입력층에 입력받으며, 출력 또한 3차원 데이터로 출력하여 다음 계층(layer)으로 전달하기 때문에 CNN에서는 이미지 데이터처럼 형상을 가지는 데이터를 제대로 학습할 가능성이 높다고 할 수 있다.
+합성곱층은 CNN에서 가장 중요한 구성요소이며, 2.1의 완전연결 계층과는 달리 **합성곱층(convolutional layer)**은 아래의 그림과 같이 입력 데이터의 형상을 유지한다. 3차원의 이미지 그대로 입력층에 입력받으며, 출력 또한 3차원 데이터로 출력하여 다음 계층(layer)으로 전달하기 때문에 CNN에서는 이미지 데이터처럼 형상을 가지는 데이터를 제대로 학습할 가능성이 높다고 할 수 있다.
 
    
 
@@ -56,7 +69,7 @@ CNN의 구조는 아래의 그림과 같이 완전연결(fully connected)계층�
 
 
 
-### 13.2.3 필터 (Filter)
+### 2.3 필터 (Filter)
 
 위에서 설명한 수용영역(receptive field)을 합성곱층에서 **필터(filter)** 또는 커널(kernel)이라고 한다. 아래의 그림처럼, 이 필터가 바로 합성곱층에서의 가중치 파라미터($\mathbf{W}$)에 해당하며, 학습단계에서 적절한 필터를 찾도록 학습되며,  합성곱 층에서 입력데이터에 필터를 적용하여 필터와 유사한 이미지의 영역을 강조하는 **특성맵(feature map)**을 출력하여 다음 층(layer)으로 전달한다.
 
@@ -68,7 +81,7 @@ CNN의 구조는 아래의 그림과 같이 완전연결(fully connected)계층�
 
 
 
-### 13.2.4 합성곱 (Convolution) vs. 교차 상관 (Cross-Correlation)
+### 2.4 합성곱 (Convolution) vs. 교차 상관 (Cross-Correlation)
 
 합성곱은 *'하나의 함수와 또 다른 함수를 **반전** 이동한 값을 곱한 다음, 구간에 대해 적분하여 새로운 함수를 구하는 연산자이다'* 라고 [wikipedia](https://ko.wikipedia.org/wiki/%ED%95%A9%EC%84%B1%EA%B3%B1)에서 정의하고 있다. 합성곱 연산은 푸리에 변환(Fourier transform)과 라플라스 변환(Laplace transform)에 밀접한 관계가 있으며 신호 처리 분야에서 많이 사용된다. 
 
@@ -109,7 +122,7 @@ CNN의 합성곱층(convolutional layer)에서는 합성곱이 아닌, 교차상
 
 
 
-### 13.2.5 합성곱층 연산
+### 2.5 합성곱층 연산
 
 그럼, 합성곱 계층에서 연산이 어떻게 이루어지는지 알아보도록 하자. 데이터와 필터(또는 커널)의 모양을 (높이, 너비)로 나타내고, 윈도우(Window)라고 부른다. 여기서 입력 데이터는 (4, 4), 필터는 (3, 3)이고, 필터가 바로 **Conv Layer의 가중치에 해당**한다. 
 
@@ -121,7 +134,7 @@ CNN의 합성곱층(convolutional layer)에서는 합성곱이 아닌, 교차상
 
 
 
-### 13.2.6 패딩 (padding)
+### 2.6 패딩 (padding)
 
 패딩(Padding)은 합성곱 연산을 수행하기 전, 입력데이터 주변을 특정값으로 채워 늘리는 것을 말한다. 패딩(Padding)은 주로 출력데이터의 공간적(Spatial)크기를 조절하기 위해 사용한다. 패딩을 할 때 채울 값은 hyper-parameter로 어떤 값을 채울지 결정할 수 있지만, 주로 **zero-padding**을 사용한다. 
 
@@ -131,7 +144,7 @@ CNN의 합성곱층(convolutional layer)에서는 합성곱이 아닌, 교차상
 
 
 
-### 13.2.7 스트라이드(Stride)
+### 2.7 스트라이드(Stride)
 
 스트라이드는 입력데이터에 필터를 적용할 때 이동할 간격을 조절하는 것, 즉 **필터가 이동할 간격을 말한다**. 스트라이드 또한 출력 데이터의 크기를 조절하기 위해 사용한다. 스트라이드(Stride)는 보통 1과 같이 작은 값이 더 잘 작동하며, Stride가 1일 경우 입력 데이터의 spatial 크기는 pooling 계층에서만 조절하게 할 수 있다. 아래의 그림은 1폭 짜리 zero-padding과 Stride값을 1로 적용한 뒤 합성곱 연산을 수행하는 예제이다.
 
@@ -139,7 +152,7 @@ CNN의 합성곱층(convolutional layer)에서는 합성곱이 아닌, 교차상
 
 
 
-### 13.2.8 출력 크기 계산
+### 2.8 출력 크기 계산
 
 패딩과 스트라이드를 적용하고, 입력데이터와 필터의 크기가 주어졌을 때 출력 데이터의 크기를 구하는 식은 아래와 같다.
 
@@ -167,7 +180,7 @@ $$
 
 
 
-### 13.2.9 3차원 데이터의 합성곱
+### 2.9 3차원 데이터의 합성곱
 
 지금까지는 이미지 데이터에서 채널(channel)을 제외한 2차원(높이, 너비)의 형상에 대해 합성곱층에서의 연산에 대해 알아보았다. 이번에는 채널을 고려한 3차원 데이터에 대해 합성곱 연산을 알아보도록 하자. 예를 들어 아래의 그림(출처: [밑바닥부터 시작하는 딥러닝](https://github.com/WegraLee/deep-learning-from-scratch))처럼, 3개의 채널을 가지는 이미지의 다음과 같이 합성곱 연산을 수행할 수 있는데, 여기서 주의해야할 점은 합성곱 연산을 수행할 때, **입력 데이터의 채널 수와 필터의 채널수가 같아야 한다**.
 
@@ -224,7 +237,7 @@ $$
 
 
 
-### 13.2.10 텐서플로에서의 합성곱층
+### 2.10 텐서플로에서의 합성곱층
 
 텐서플로(TensorFlow)에서 각 입력이미지는 `[높이, 너비, 채널] = [H, W, CH]`형태의 3D 텐서([Tensor](http://excelsior-cjh.tistory.com/148?category=940399))로 표현되며, 미니배치(mini-batch)는 `[batch, H, W, CH]` 형태의 4D 텐서로 표현된다. 합성곱층에서의 필터(또는 커널)는 `[FH, FW, In_CH, Out_CH]=` $[f_h, f_w, f_{n'}, f_n]$ 형태의 4D 텐서로 표현된다. 
 
@@ -307,9 +320,9 @@ conv = tf.layers.conv2d(inputs, filters=32, kernel_size=3,  # or kernel_size=[3,
 
 
 
-## 13.3 풀링층 (Pooling Layer)
+## 3. 풀링층 (Pooling Layer)
 
-### 13.3.1 풀링층이란
+### 3.1 풀링층이란
 
 지금까지 합성곱층(convolutional layer)에 대해 알아보았다. 이제는 CNN의 또 다른 계층인 풀링층(Pooling Layer)에 대해 알아보도록 하자.
 
@@ -325,7 +338,7 @@ conv = tf.layers.conv2d(inputs, filters=32, kernel_size=3,  # or kernel_size=[3,
 
 
 
-### 13.3.2 텐서플로에서의 풀링층
+### 3.2 텐서플로에서의 풀링층
 
 텐서플로에서는 [`tf.nn.max_pool()`](https://www.tensorflow.org/api_docs/python/tf/nn/max_pool)과 [`tf.layers.max_pooling2d()`](https://www.tensorflow.org/api_docs/python/tf/layers/max_pooling2d)을 사용해 Max-Pooling을 구현할 수 있으며, Average-Pooling의 경우 [`tf.nn.avg_pool()`](https://www.tensorflow.org/api_docs/python/tf/nn/avg_pool)과 [`tf.layers.average_pooling2d`](https://www.tensorflow.org/api_docs/python/tf/layers/average_pooling2d) 로 구현할 수 있다. 여기에서는 Max-Pooling 구현에 대해 알아보도록 하자.
 
@@ -377,3 +390,8 @@ tf.layers.max_pooling2d(
 tf.layers.max_pooling2d(inputs, pool_size=[2, 2], strides=[2, 2], padding='same')
 ```
 
+
+
+## 4. 마무리
+
+이번 포스팅에서는 합성곱 신경망(CNN, Convolutional Neural Networks)에 대해 자세하게 알아보았다. CNN에 대한 실습 코드는 https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap13-Convolutional_Neural_Networks/Chap13-Convolutional_Neural_Networks.ipynb 에서 확인할 수 있다.

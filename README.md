@@ -22,6 +22,13 @@
 ### Part 2. 신경망과 딥러닝
 - Chap09 - [텐서플로 시작하기](https://github.com/ExcelsiorCJH/Hands-On-ML/tree/master/Chap09-Up_and_Running_with_TensorFlow)
 - Chap10 - [인공 신경망 소개](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap10-Introduction_to_ANN/Chap10-Introduction_to_ANN.ipynb)
+- Chap11 - 심층 신경망 훈련
+  - [활성화 함수, 가중치 초기화](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_1-Training_DNN.ipynb)
+  - [배치 정규화, 그래디언트 클리핑](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_2-Training_DNN.ipynb)
+  - [학습된 모델 재사용하기](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap11-Training_DNN/Chap11_3-Training_DNN.ipynb)
+  - 고속 옵티마이저 → *업로드 예정*
+- Chap12 - 다중 머신과 장치를 위한 분산 텐서플로 → *업로드 예정*
+- Chap13 - [합성곱 신경망](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap13-Convolutional_Neural_Networks/Chap13-Convolutional_Neural_Networks.ipynb)
 
 ## 3. 참고자료
 
