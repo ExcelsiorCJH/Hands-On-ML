@@ -7,9 +7,6 @@
 
 
 
-ㅁㅇㄴㄹㅇ
-
-
 
 # 06. 합성곱 신경망 - Convolutional Neural Networks
 
