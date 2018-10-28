@@ -29,6 +29,10 @@
   - 고속 옵티마이저 → *업로드 예정*
 - Chap12 - 다중 머신과 장치를 위한 분산 텐서플로 → *업로드 예정*
 - Chap13 - [합성곱 신경망](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap13-Convolutional_Neural_Networks/Chap13-Convolutional_Neural_Networks.ipynb)
+- Chap14 - [순환 신경망, RNN]
+    - [(1)-RNN 구조](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap14-Recurrent_Neural_Networks/Chap14_1-Recurrent_Neural_Networks.ipynb)
+    - [(2)-RNN 학습시키기, Deep RNN](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap14-Recurrent_Neural_Networks/Chap14_2-Recurrent_Neural_Networks.ipynb)
+    - [(3)-LSTM, GRU](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap14-Recurrent_Neural_Networks/Chap14_3-Recurrent_Neural_Networks.ipynb)
 
 ## 3. 참고자료
 
