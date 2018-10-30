@@ -112,12 +112,12 @@ lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=n_neurons)
 
 ### 2.2 핍홀(peephole) 연결
 
-핍홀 연결(peephole connection)은 2000년에 F. Gers와 J.Schmidhuber가 ['Recurrent Nets that and Count'](ftp://ftp.idsia.ch/pub/juergen/TimeCount-IJCNN2000.pdf) 논문에서 제안한 LSTM의 변종이다. 기존의 LSTM에서 gate controller($\mathbf{f}_{t}, \mathbf{i}_{t}, \mathbf{o}_{t}$)는 입력 $\mathbf{x}_{t}$와 이전 타임스텝의 단기 상태 $\mathbf{h}_{t-1}$만 입력으로 받는다. 하지만 위의 논문에서 제안한 핍홀 연결을 아래의 그림과 같이 연결 해주면서 gate controller에 이전 타임스텝의 장기 상태 $\mathbf{c}_{t-1}$가 입력으로 추가되며, 좀 더 많은 맥락(context)를 인식할 수 있다.
+핍홀 연결(peephole connection)은 2000년에 F. Gers와 J.Schmidhuber가 ['Recurrent Nets that and Count'](ftp://ftp.idsia.ch/pub/juergen/TimeCount-IJCNN2000.pdf) 논문에서 제안한 LSTM의 변종이다. 기존의 LSTM에서 gate controller($\mathbf{f}_{t}, \mathbf{i}_{t}, \mathbf{o}_{t}​$)는 입력 $\mathbf{x}_{t}​$와 이전 타임스텝의 단기 상태 $\mathbf{h}_{t-1}​$만 입력으로 받는다. 하지만 위의 논문에서 제안한 핍홀 연결을 아래의 그림과 같이 연결 해주면서 gate controller에 이전 타임스텝의 장기 상태 $\mathbf{c}_{t-1}​$가 입력으로 추가되며, 좀 더 많은 맥락(context)를 인식할 수 있다.
 
 
 $$
 \begin{eqnarray} 
-\mathbf{f}_{t} & = & \sigma \left( \mathbf{W}_{cf}^{T} \cdot \mathbf{c}_{t-1} + \mathbf{W}_{xf}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{hf}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{f} \right) \\ \mathbf{i}_{t} & =  & \sigma \left( \mathbf{W}_{ci}^{T} \cdot \mathbf{c}_{t-1} + \mathbf{W}_{xi}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{hi}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{i} \right) \\ \mathbf{o}_{t} & = & \sigma \left( \mathbf{W}_{co}^{T} \cdot \mathbf{c}_{t-1} + \mathbf{W}_{xo}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{ho}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{o} \right)
+\mathbf{f}_{t} & = & \sigma \left( \mathbf{W}_{cf}^{T} \cdot \mathbf{c}_{t-1} + \mathbf{W}_{xf}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{hf}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{f} \right) \\ \mathbf{i}_{t} & =  & \sigma \left( \mathbf{W}_{ci}^{T} \cdot \mathbf{c}_{t-1} + \mathbf{W}_{xi}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{hi}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{i} \right) \\ \mathbf{o}_{t} & = & \sigma \left( \mathbf{W}_{co}^{T} \cdot \mathbf{c}_{t} + \mathbf{W}_{xo}^{T} \cdot \mathbf{x}_{t} + \mathbf{W}_{ho}^{T} \cdot \mathbf{h}_{t-1} + \mathbf{b}_{o} \right)
 \end{eqnarray}
 $$
 ![peephole connection](./images/lstm02.PNG)
