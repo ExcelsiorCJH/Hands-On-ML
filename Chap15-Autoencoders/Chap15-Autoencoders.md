@@ -262,3 +262,329 @@ epoch : 4, Train MSE : 0.01720
 
 ![](./images/stacked-ae04.PNG)
 
+
+
+- [단계 1]에서 첫 번째 오토인코더는 입력을 재구성하도록 학습된다.
+- [단계 2]에서는 두 번째 오토인코더가 첫 번째 히든 레이어(`Hidden 1`)의 출력을 재구성하도록 학습된다.
+
+- [단계 3]에서는 단계1 ~ 2의 오토인코더를 합쳐 최종적으로 하나의 stacked-오토인코더를 구현한다.
+
+
+
+텐서플로에서 이렇게 여러 단계의 오토인코더를 학습시키는 방법으로는 다음과 같이 두 가지 방법이 있다.
+
+-  각 단계마다 다른 텐서플로 그래프(graph)를 사용하는 방법
+- 하나의 그래프에 각 단계의 학습을 수행하는 방법
+
+위의 두 가지 방법에 대한 코드는 [ExcelsiorCJH's GitHub](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap15-Autoencoders/Chap15-Autoencoders.ipynb) 에서 확인할 수 있다.
+
+
+
+## 4. Stacked-오토인코더를 이용한 비지도 사전학습
+
+대부분이 레이블되어 있지 않는 데이터셋이 있을 때, 먼저 전체 데이터를 사용해 stacked-오토인코더를 학습시킨다. 그런 다음 오토인코더의 하위 레이어를 재사용해 분류와 같은 실제 문제를 해결하기 위한 신경망을 만들고 레이블된 데이터를 사용해 학습시킬 수 있다.
+
+
+
+![](./images/unsupervised.PNG)
+
+
+
+위와 같은 방법을 텐서플로에서 구현할 때는 [Transfer Learning](http://excelsior-cjh.tistory.com/179?category=940399)포스팅에서 살펴본 방법과 같이 구현하면 된다. 이러한 비지도 사전학습 방법에 대한 소스코드는 [여기](https://github.com/rickiepark/handson-ml/blob/master/15_autoencoders.ipynb)에서 확인할 수 있다.
+
+
+
+## 5. Denoising 오토인코더
+
+오토인코더가 의미있는 특성(feature)을 학습하도록 제약을 주는 다른 방법은 입력에 노이즈(noise, 잡음)를 추가하고, 노이즈가 없는 원본 입력을 재구성하도록 학습시키는 것이다. 노이즈는 아래의 그림처럼 입력에 [가우시안(Gaussian) 노이즈](https://en.wikipedia.org/wiki/Gaussian_noise)를 추가하거나, 드롭아웃(dropout)처럼 랜덤하게 입력 유닛(노드)를 꺼서 발생 시킬 수 있다.
+
+
+
+![denoising-autoencoder](./images/denoising.PNG)
+
+
+
+### 5.1 텐서플로로 구현하기
+
+이번에는 텐서플로를 이용해 가우시안 노이즈와 드롭아웃을 이용한 denoising-오토인코더를 구현해보도록 하자. 오토인코더 학습에 사용한 데이터셋은 위에서 부터 다뤘던 MNIST 데이터셋이다.  아래의 코드에 대한 전체 코드는 [ExcelsiorCJH's GitHub](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap15-Autoencoders/Chap15-Autoencoders.ipynb)에서 확인할 수 있다.
+
+#### 5.1.1 Gaussian noise
+
+```python
+import sys
+import numpy as np
+import tensorflow as tf
+
+################
+# layer params #
+################
+noise_level = 1.0
+n_inputs = 28 * 28
+n_hidden1 = 300
+n_hidden2 = 150  # coding units
+n_hidden3 = n_hidden1
+n_outputs = n_inputs
+
+################
+# train params #
+################
+learning_rate = 0.01
+n_epochs = 5
+batch_size = 150
+
+# denoising autoencoder
+inputs = tf.placeholder(tf.float32, shape=[None, n_inputs])
+# add gaussian noise
+inputs_noisy = inputs + noise_level * tf.random_normal(tf.shape(inputs))
+
+hidden1 = tf.layers.dense(inputs_noisy, n_hidden1, activation=tf.nn.relu, name='hidden1')
+hidden2 = tf.layers.dense(hidden1, n_hidden2, activation=tf.nn.relu, name='hidden2')
+hidden3 = tf.layers.dense(hidden2, n_hidden3, activation=tf.nn.relu, name='hidden3')
+outputs = tf.layers.dense(hidden3, n_outputs, name='outputs')
+
+# loss 
+reconstruction_loss = tf.losses.mean_squared_error(labels=inputs, predictions=outputs)
+# optimizer
+train_op = tf.train.AdamOptimizer(learning_rate).minimize(reconstruction_loss)
+
+# saver
+saver = tf.train.Saver()
+
+# Train
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    n_batches = len(train_x) // batch_size
+    for epoch in range(n_epochs):
+        for iteration in range(n_batches):
+            print("\r{}%".format(100 * iteration // n_batches), end="")
+            sys.stdout.flush()
+            batch_x, batch_y = next(shuffle_batch(train_x, train_y, batch_size))
+            sess.run(train_op, feed_dict={inputs: batch_x})
+        loss_train = reconstruction_loss.eval(feed_dict={inputs: batch_x})
+        print('\repoch : {}, Train MSE : {:.5f}'.format(epoch, loss_train))
+    saver.save(sess, './model/my_model_stacked_denoising_gaussian.ckpt')
+    
+'''
+epoch : 0, Train MSE : 0.04450
+epoch : 1, Train MSE : 0.04073
+epoch : 2, Train MSE : 0.04273
+epoch : 3, Train MSE : 0.04194
+epoch : 4, Train MSE : 0.04084
+'''
+```
+
+
+
+위의 가우시안 노이즈를 추가한 denoising-오토인코더의 MNIST 재구성 결과는 다음과 같다.
+
+![](./images/denoising02.PNG)
+
+
+
+#### 5.1.2 Dropout
+
+```python
+import sys
+import numpy as np
+import tensorflow as tf
+
+################
+# layer params #
+################
+noise_level = 1.0
+n_inputs = 28 * 28
+n_hidden1 = 300
+n_hidden2 = 150  # coding units
+n_hidden3 = n_hidden1
+n_outputs = n_inputs
+
+################
+# train params #
+################
+dropout_rate = 0.3
+learning_rate = 0.01
+n_epochs = 5
+batch_size = 150
+
+training = tf.placeholder_with_default(False, shape=(), name='training')
+
+# denoising autoencoder
+inputs = tf.placeholder(tf.float32, shape=[None, n_inputs])
+# add dropout
+inputs_drop = tf.layers.dropout(inputs, dropout_rate, training=training)
+
+hidden1 = tf.layers.dense(inputs_drop, n_hidden1, activation=tf.nn.relu, name='hidden1')
+hidden2 = tf.layers.dense(hidden1, n_hidden2, activation=tf.nn.relu, name='hidden2')
+hidden3 = tf.layers.dense(hidden2, n_hidden3, activation=tf.nn.relu, name='hidden3')
+outputs = tf.layers.dense(hidden3, n_outputs, name='outputs')
+
+# loss 
+reconstruction_loss = tf.losses.mean_squared_error(labels=inputs, predictions=outputs)
+# optimizer
+train_op = tf.train.AdamOptimizer(learning_rate).minimize(reconstruction_loss)
+
+# saver
+saver = tf.train.Saver()
+
+# Train
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    n_batches = len(train_x) // batch_size
+    for epoch in range(n_epochs):
+        for iteration in range(n_batches):
+            print("\r{}%".format(100 * iteration // n_batches), end="")
+            sys.stdout.flush()
+            batch_x, batch_y = next(shuffle_batch(train_x, train_y, batch_size))
+            sess.run(train_op, feed_dict={inputs: batch_x})
+        loss_train = reconstruction_loss.eval(feed_dict={inputs: batch_x})
+        print('\repoch : {}, Train MSE : {:.5f}'.format(epoch, loss_train))
+    saver.save(sess, './model/my_model_stacked_denoising_dropout.ckpt')
+```
+
+![](./images/denoising03.PNG)
+
+
+
+
+
+## 6. Sparse 오토인코더
+
+오토인코더가 좋은 특성을 추출하도록 만드는 다른 제약 방법은 **희소성**(sparsity)를 이용하는 것인데, 이러한 오토인코더를 Sparse Autoencoder라고 한다. 이 방법은 손실함수에 적절한 항을 추가하여 오토인코더가 코딩층(coding layer, 가운데 층)에서 활성화되는 뉴런 수를 감소시키는 것이다. 예를들어 코딩층에서 평균적으로 5% 뉴런만 홀성화되도록 만들어 주게 되면, 오토인코더는 5%의 뉴런을 조합하여 입력을 재구성해야하기 때문에 유용한 특성을 표현하게 된다.
+
+이러한 Sparse-오토인코더를 만들기 위해서는 먼저 학습 단계에서 코딩층의 실제 sparse(희소) 정도를 측정해야 하는데, 전체 학습 배치(batch)에 대해 코딩층의 평균적인 활성화를 계산한다. 배치의 크기는 너무 작지 않게 설정 해준다. 
+
+위에서 각 뉴런에 대한 평균 활성화 정도를 계산하여 구하고, 손실함수에 **희소 손실**(sparsity loss)를 추가하여 뉴런이 크게 활성화 되지 않도록 규제할 수 있다.  예를들어 한 뉴런의 평균 활성화가 `0.3`이고 목표 희소 정도가 `0.1`이라면, 이 뉴런은 **덜** 활성화 되도록 해야한다. 희소 손실을 구하는 간단한 방법으로는 제곱 오차 $(0.3 - 0.1)^{2}$를 추가하는 방법이 있다. 하지만, Sparse-오토인코더에서는 아래의 그래프 처럼 MSE보다 더 경사가 급한 쿨백 라이블러 발산(KL-divergense, Kullback-Leibler divergense)을 사용한다.
+
+
+
+![](./images/kl.PNG)
+
+
+
+### 6.1 쿨백 라이블러 발산
+
+쿨백-라이블러 발산(Kullback-Leibler divergence, KLD)은 두 확률분포의 차이를 계산하는 데 사용하는 함수이다. 예를들어 딥러닝 모델을 만들 때, 학습 데이터셋의 분포 $P(x)$와 모델이 추정한 데이터의 분포 $Q(x)$ 간에 차이를 KLD를 활용해 구할 수 있다([ratsgo's blog](https://ratsgo.github.io/statistics/2017/09/22/information/)).
+
+
+
+$$
+{ D }_{ KL }\left( P||Q \right) ={ E }_{ X\sim P }\left[ \log { \frac { P\left( x \right)  }{ Q(x) }  }  \right] ={ E }_{ X\sim P }\left[ \log { P(x) } -\log { Q(x) }  \right]
+$$
+
+
+
+Sparse-오토인코더에서는 코딩층에서 뉴런이 활성화될 목표 확률 $p$와 실제확률 $q$(학습 배치에 대한 평균 활성화) 사이의 발산을 측정하며, 식은 다음과 같다.
+
+
+$$
+D_{KL}\left( p||q \right) = p \log{\frac{p}{q}} + \left( 1- p \right) \log{\frac{1-p}{1-q}}
+$$
+
+
+위의 식을 이용해 코딩층의 각 뉴런에 대해 희소 손실을 구하고 이 손실을 모두 합한 뒤 희소 가중치 하이퍼파라미터를 곱하여 손실함수의 결과에 더해준다.
+$$
+Loss = \text{MSE} + \text{sparsity_weight} \times \text{sparsity_loss}
+$$
+
+
+### 6.2 텐서플로 구현
+
+이번에는 텐서플로를 이용해 Sparse-오토인코더를 구현해보도록 하자. 
+
+```python
+import sys
+import numpy as np
+import tensorflow as tf
+
+################
+# layer params #
+################
+noise_level = 1.0
+n_inputs = 28 * 28
+n_hidden1 = 1000 # sparsity coding units
+n_outputs = n_inputs
+
+################
+# train params #
+################
+sparsity_target = 0.1  # p
+sparsity_weight = 0.2
+learning_rate = 0.01
+n_epochs = 20
+batch_size = 1000
+
+def kl_divergence(p, q):
+    # 쿨백 라이블러 발산
+    return p * tf.log(p / q) + (1 - p) * tf.log((1 - p) / (1 - q))
+
+inputs = tf.placeholder(tf.float32, shape=[None, n_inputs])
+
+hidden1 = tf.layers.dense(inputs, n_hidden1, activation=tf.nn.sigmoid)
+outputs = tf.layers.dense(hidden1, n_outputs)
+
+# loss
+hidden1_mean = tf.reduce_mean(hidden1, axis=0)  # 배치 평균  == q
+sparsity_loss = tf.reduce_sum(kl_divergence(sparsity_target, hidden1_mean))
+reconstruction_loss = tf.losses.mean_squared_error(labels=inputs, predictions=outputs)
+loss = reconstruction_loss + sparsity_weight * sparsity_loss
+
+# optimizer
+train_op = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+
+# saver
+saver = tf.train.Saver()
+
+# Train
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    n_batches = len(train_x) // batch_size
+    for epoch in range(n_epochs):
+        for iteration in range(n_batches):
+            print("\r{}%".format(100 * iteration // n_batches), end="")
+            sys.stdout.flush()
+            batch_x, batch_y = next(shuffle_batch(train_x, train_y, batch_size))
+            sess.run(train_op, feed_dict={inputs: batch_x})
+        recon_loss_val, sparsity_loss_val, loss_val = sess.run([reconstruction_loss, 
+                                                                sparsity_loss,
+                                                                loss], feed_dict={inputs: batch_x})
+        print('\repoch : {}, Train MSE : {:.5f}, \
+                sparsity_loss : {:.5f}, total_loss : {:.5f}'.format(epoch, recon_loss_val,
+                                                                    sparsity_loss_val, loss_val))
+    saver.save(sess, './model/my_model_sparse.ckpt')
+```
+
+![](./images/sparse.PNG)
+
+
+
+## 7. Variational AutoEncoder (VAE)
+
+**VAE**(Variational AutoEncoder)는 2014년 D.Kingma와 M.Welling이 [Auto-Encoding Variational Bayes](https://arxiv.org/pdf/1312.6114v10.pdf) 논문에서 제안한 오토인코더의 한 종류이다. VAE는 위에서 살펴본 오터인코더와는 다음과 같은 다른점이 있다.
+
+- VAE는 **확률적 오토인코더**(probabilistic autoencoder)다. 즉, 학습이 끝난 후에도 출력이 부분적으로 우연에 의해 결정된다.
+- VAE는 **생성 오토인코더**(generatie autoencoder)이며, 학습 데이터셋에서 샘플링된 것과 같은 새로운 샘플을 생성할 수 있다.
+
+VAE의 구조는 아래의 그림과 같다.
+
+
+
+![](./images/vae.PNG)
+
+
+
+VAE의 코딩층은 다른 오토인코더와는 다른 부분이 있는데 주어진 입력에 대해 바로 코딩을 만드는 것이 아니라, 인코더(encoder)는 **평균 코딩** $\mu$와 **표준편차 코딩** $\sigma$ 을 만든다. 실제 코딩은 평균이 $\mu$이고 표준편차가 $\sigma$인 가우시안 분포(gaussian distribution)에서 랜덤하게 샘플링되며, 이렇게 샘플링된 코딩을 디코더(decoder)가 원본 입력으로 재구성하게 된다.
+
+VAE는 마치 가우시안 분포에서 샘플링된 것처럼 보이는 코딩을 만드는 경향이 있는데, 학습하는 동안 손실함수가 코딩(coding)을 가우시안 샘플들의 집합처럼 보이는 형태를 가진 코딩 공간(coding space) 또는 **잠재 변수 공간**(latent space)로 이동시키기 때문이다. 
+
+이러한 이유로 VAE는 학습이 끝난 후에 새로운 샘플을 가우시안 분포로 부터 랜덤한 코딩을 샘플링해 디코딩해서 생성할 수 있다.
+
+
+
+### 7.1 VAE의 손실함수
+
+VAE의 손실함수는 두 부분으로 구성되어 있다. 첫 번째는 오토인코더가 입력을 재구성하도록 만드는 일반적인 재구성 손실(reconstruction loss)이고, 두 번째는 가우시안 분포에서 샘플된 것 샅은 코딩을 가지도록 오토인코더를 제어하는 **latent loss**이다. 이 손실함수의 식에 대해서는 [ratsgo](https://ratsgo.github.io/generative%20model/2018/01/27/VAE/)님의 블로그를 참고하면 자세히 설명되어 있다. *(나도 언젠가 이해해서 포스팅할 날이 오기를...)*
+
+
+
+### 7.2 텐서플로 구현
+
