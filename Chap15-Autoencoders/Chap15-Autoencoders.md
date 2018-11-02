@@ -1,3 +1,7 @@
+>  이번 포스팅은 [핸즈온 머신러닝](http://www.yes24.com/24/goods/59878826?scode=032&OzSrank=1) 교재를 가지고 공부한 것을 정리한 포스팅입니다. 
+
+ㅇㄹ
+
 # 08. 오토인코더 - Autoencoder
 
 
@@ -587,4 +591,94 @@ VAE의 손실함수는 두 부분으로 구성되어 있다. 첫 번째는 오�
 
 
 ### 7.2 텐서플로 구현
+
+```python
+import sys
+import numpy as np
+import tensorflow as tf
+from functools import partial
+
+reset_graph()
+
+################
+# layer params #
+################
+n_inputs = 28 * 28
+n_hidden1 = 500
+n_hidden2 = 500
+n_hidden3 = 20  # 코딩 유닛
+n_hidden4 = n_hidden2
+n_hidden5 = n_hidden1
+n_outputs = n_inputs
+
+################
+# train params #
+################
+learning_rate = 0.001
+n_digits = 60
+n_epochs = 50
+batch_size = 150
+
+initializer = tf.variance_scaling_initializer()
+dense_layer = partial(
+    tf.layers.dense,
+    activation=tf.nn.elu, 
+    kernel_initializer=initializer)
+
+
+# VAE
+inputs = tf.placeholder(tf.float32, [None, n_inputs])
+hidden1 = dense_layer(inputs, n_hidden1)
+hidden2 = dense_layer(hidden1, n_hidden2)
+hidden3_mean = dense_layer(hidden2, n_hidden3, activation=None) # mean coding
+hidden3_sigma = dense_layer(hidden2, n_hidden3, activation=None)  # sigma coding
+noise = tf.random_normal(tf.shape(hidden3_sigma), dtype=tf.float32)  # gaussian noise
+hidden3 = hidden3_mean + hidden3_sigma * noise
+hidden4 = dense_layer(hidden3, n_hidden4)
+hidden5 = dense_layer(hidden4, n_hidden5)
+logits = dense_layer(hidden5, n_outputs, activation=None)
+outputs = tf.sigmoid(logits)
+
+# loss
+eps = 1e-10  # NaN을 반환하는 log(0)을 피하기 위함
+xentropy = tf.nn.sigmoid_cross_entropy_with_logits(labels=inputs, logits=logits)
+reconstruction_loss = tf.reduce_mean(xentropy)
+latent_loss = 0.5 * tf.reduce_sum(
+    tf.square(hidden3_sigma) + tf.square(hidden3_mean)
+    - 1 - tf.log(eps + tf.square(hidden3_sigma)))
+
+loss = reconstruction_loss + latent_loss
+
+# optimizer
+train_op = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+
+# saver
+saver = tf.train.Saver()
+
+# train
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    saver.restore(sess, './model/my_model_variational.ckpt')
+    n_batches = len(train_x) // batch_size
+    for epoch in range(n_epochs):
+        for iteration in range(n_batches):
+            print("\r{}%".format(100 * iteration // n_batches), end="")
+            sys.stdout.flush()
+            batch_x, batch_y = next(shuffle_batch(train_x, train_y, batch_size))
+            sess.run(train_op, feed_dict={inputs: batch_x})
+        recon_loss_val, latent_loss_val, loss_val = sess.run([reconstruction_loss, 
+                                                              latent_loss,
+                                                              loss], feed_dict={inputs: batch_x})
+        print('\repoch : {}, Train MSE : {:.5f},'.format(epoch, recon_loss_val),
+               'latent_loss : {:.5f}, total_loss : {:.5f}'.format(latent_loss_val, loss_val))
+    saver.save(sess, './model/my_model_variational.ckpt')
+```
+
+
+
+
+
+## 8. 마무리
+
+이번 포스팅에서는 자기지도학습(self-supervised learning)인 오토인코더에 대해 개념과 uncomplete, stacked, denoising, sparse, VAE 오토인코더에 대해 알아보았다. 위의 코드에 대한 전체 코드는 https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap15-Autoencoders/Chap15-Autoencoders.ipynb 에서 확인할 수 있다.
 
