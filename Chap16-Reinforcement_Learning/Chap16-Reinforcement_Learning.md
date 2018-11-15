@@ -74,7 +74,7 @@ pip install --upgrade gym
 
 
 
-설치가 완료 되었으면, 아래의 코드와 같이 `gym` 모듈을 `import`하여 환경을 구성할 수 있다. 아래의 예제는 `CartPole` 환경으로 카트 위에 놓인 막대가 넘어지지 않도록 왼쪽/오른쪽으로 가속시키는 2D 시뮬레이션 환경이다.
+설치가 완료 되었으면, 아래의 코드와 같이 `gym` 모듈을 `import`하여 환경을 구성할 수 있다. 아래의 예제는 `CartPole` 환경으로 카트 위에 놓인 막대가 넘어지지 않도록 왼쪽/오른쪽으로 가속시키는 2D 시뮬레이션 환경이다(자세한 코드는 [ExcelsiorCJH's github](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap16-Reinforcement_Learning/Chap16-Reinforcement_Learning.ipynb) 참고).
 
 
 
@@ -86,11 +86,14 @@ import gym
 env = gym.make("CartPole-v0")
 obs = env.reset()
 env.render()
+img = env.render(mode="rgb_array")
 print('obs.shape :', obs.shape)
 print('obs :', obs)
+print('img.shape :', img.shape)
 '''
 obs.shape : (4,)
 obs : [ 0.01108219  0.0056951  -0.01854807 -0.00028084]
+img.shape : (400, 600, 3)
 '''
 ```
 
@@ -103,3 +106,95 @@ obs : [ 0.01108219  0.0056951  -0.01854807 -0.00028084]
   - `obs = [카트의 수평 위치, 속도, 막대의 각도, 각속도]`
 
 - `render()` 메서드는 jupyter notebook이나 별도의 창에 위의 그림과 같이 환경을 출력 해준다.
+
+
+
+CartPole의 환경에서는 어떤 행동(action)이 가능한지 `action_space`를 통해 확인할 수 있다.
+
+```python
+print('env.action_sapce :', env.action_sapce)
+'''
+env.action_space : Discrete(2)
+'''
+```
+
+
+
+`Discrete(2)`는 가능한 행동이 `0`(왼쪽)과 `1`(오른쪽)이라는 것을 의미한다. 아래의 코드에서 `step()` 메서드를 통해 막대를 오른쪽(`1`)으로 가속 시켜보자.
+
+```python
+action = 1  # 오른쪽으로 가속
+obs, reward, done, info = env.step(action)
+
+print('obs :', obs)
+print('reward :', reward)
+print('done :', done)
+print('info :', info)
+
+'''
+obs : [ 0.03911776  0.22359678  0.00237012 -0.31420171]
+reward : 1.0
+done : False
+info : {}
+'''
+```
+
+
+
+위의 출력결과 처럼, `step()` 메서드는 주어진 행동을 실행하고 `obs, reward, done, info` 4개의 값을 리턴한다.
+
+- `obs` : 새로운 관측값
+- `reward` : 행동에 대한 보상을 말하며, 여기서는 매 스텝마다 `1`의 보상을 받는다.
+- `done` : 값이 `True` 이면, 에피소드(게임 한판)가 끝난것을 말한다. 여기서는 막대가 넘어진 경우를 말한다.
+- `info` : 추가적인 디버깅 정보가 딕셔너리 형태로 저장된다. 여기서는 별도의 정보가 따로 없다.
+
+
+
+이번에는 간단한 정책(policy)를 하드코딩 해보도록 하자. 이 정책은 막대가 기울어지는 방향과 반대로 가속시키며, 아래의 코드처럼 20번의 에피소드를 실행해서 얻은 평균 보상을 확인하는 코드이다(자세한 코드는 [ExcelsiorCJH's github](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap16-Reinforcement_Learning/Chap16-Reinforcement_Learning.ipynb) 참고).
+
+```python
+def basic_policy(obs):  # 정책 함수
+    angle = obs[2]
+    return 0 if angle <0 else 1
+
+totals = []
+for episode in range(20):
+    episode_rewards = 0
+    obs = env.reset()
+    for step in range(1000):  # 최대 스텝을 1000번으로 설정
+        action = basic_policy(obs)
+        obs, reward, done, info = env.step(action)
+        episode_rewards += reward
+        if done:
+            break
+    totals.append(episode_rewards)
+```
+
+
+
+위의 정책에 대한 결과를 아래의 코드를 통해 확인할 수 있다.
+
+```python
+import numpy as np
+
+print('totals mean :', np.mean(totals))
+print('totals std :', np.std(totals))
+print('totals min :', np.min(totals))
+print('totals max :', np.max(totals))
+
+'''
+totals mean : 39.6
+totals std : 7.317103251970687
+totals min : 25.0
+totals max : 52.0
+'''
+```
+
+
+
+20번 정도의 에피소드를 진행했을 때 이 정책(`basic_policy()`)는 막대를 쓰러뜨리지 않고 최대 52번 스텝까지만 진행한 것을 확인할 수 있다. 
+
+
+
+## 4. 신경망 정책
+
