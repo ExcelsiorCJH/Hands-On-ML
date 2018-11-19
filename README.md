@@ -35,6 +35,7 @@
     - [(3)-LSTM, GRU](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap14-Recurrent_Neural_Networks/Chap14_3-Recurrent_Neural_Networks.ipynb)
   
 - Chap15 - [오토인코더(AutoEncoder)](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap15-Autoencoders/Chap15-Autoencoders.ipynb)
+- Chap16 - [강화학습(RL, Reinforcement Learning)](https://github.com/ExcelsiorCJH/Hands-On-ML/blob/master/Chap16-Reinforcement_Learning/Chap16-Reinforcement_Learning.ipynb)
 
 ## 3. 참고자료
 
