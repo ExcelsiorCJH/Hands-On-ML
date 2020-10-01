@@ -1,4 +1,4 @@
-# Hands-On-ML
+# Hands-On-ML A True Game Changer.
 ## 1. 교재
 
 ### 핸즈온 머신러닝(Hands-On Machine Learning)
